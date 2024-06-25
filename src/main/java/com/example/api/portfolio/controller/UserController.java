@@ -97,22 +97,17 @@ public class UserController {
 
     @GetMapping("/profile")
     public ApiResponse<?> getUserProfile() {
-        // Dapatkan informasi pengguna dari objek Authentication
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User currentUser = (User) authentication.getPrincipal();
 
-       logger.info("ada data name", username);
-        MetaResponse meta = new MetaResponse("Success delete user : " + username, HttpStatus.OK.value(), "success");
-        return new ApiResponse<>(meta, null);
-        // Cari informasi pengguna dari service berdasarkan username
-//        UserDto userDto = userService.getUserByUsername(username);
+            logger.info("ada data name", currentUser);
+            MetaResponse meta = new MetaResponse("Success delete user : " + currentUser, HttpStatus.OK.value(), "success");
+            return new ApiResponse<>(meta, null);
+        } catch(Exception e){
+            MetaResponse meta = new MetaResponse(e.getMessage(), HttpStatus.OK.value(), "failed");
+            return new ApiResponse<>(meta, null);
+        }
 
-        // Jika pengguna ditemukan, kembalikan data pengguna
-//        if (userDto != null) {
-//            return ResponseEntity.ok(userDto);
-//        } else {
-//            // Jika tidak ada pengguna ditemukan, kembalikan status 404 Not Found
-//            return ResponseEntity.notFound().build();
-//        }
     }
 }

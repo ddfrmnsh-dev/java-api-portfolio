@@ -1,7 +1,10 @@
 package com.example.api.portfolio.security;
 
+import com.example.api.portfolio.controller.AuthController;
 import com.example.api.portfolio.service.MyUserDetailService;
 import io.jsonwebtoken.ExpiredJwtException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +22,7 @@ import java.io.IOException;
 
 @Component
 public class JwtRequestFilter  extends OncePerRequestFilter{
+    private static final Logger logger = LoggerFactory.getLogger(JwtRequestFilter.class);
 
     @Autowired
     private MyUserDetailService userDetailsService;
@@ -29,6 +33,8 @@ public class JwtRequestFilter  extends OncePerRequestFilter{
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         final String authorizationHeader = request.getHeader("Authorization");
+        logger.info("ada data header: {}", authorizationHeader);
+
 
         String username = null;
         String jwtToken = null;
@@ -41,6 +47,7 @@ public class JwtRequestFilter  extends OncePerRequestFilter{
             jwtToken = authorizationHeader.substring(7);
             try {
                 username = jwtUtil.extractUsername(jwtToken);
+                logger.info("ada data user filter: {}", username);
             } catch (IllegalArgumentException e) {
                 System.err.println("Unable to get JWT Token");
             } catch (ExpiredJwtException e) {

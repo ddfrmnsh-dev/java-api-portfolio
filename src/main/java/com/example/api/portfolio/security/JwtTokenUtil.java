@@ -1,7 +1,10 @@
 package com.example.api.portfolio.security;
 
+import com.example.api.portfolio.controller.AuthController;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +16,8 @@ import java.util.function.Function;
 
 @Component
 public class JwtTokenUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtTokenUtil.class);
 
     @Value("${jwt.secret}")
     private String secret;
@@ -30,6 +35,7 @@ public class JwtTokenUtil {
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
+        logger.info("ada data claims:{}", token);
         return claimsResolver.apply(claims);
     }
 
@@ -61,6 +67,7 @@ public class JwtTokenUtil {
     public Boolean validateToken(String token, String username) {
         try{
             final String extractedUsername = extractUsername(token);
+            logger.info("ada data username: {}", extractedUsername);
             return (extractedUsername.equals(username) && !isTokenExpired(token));
         }catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
             System.err.println("Error validating JWT: " + e.getMessage());
