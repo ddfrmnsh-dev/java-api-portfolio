@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -53,9 +54,9 @@ public class JwtTokenUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String username) {
+    public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        return createToken(claims, userDetails.getUsername());
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
@@ -64,11 +65,11 @@ public class JwtTokenUtil {
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
     }
 
-    public Boolean validateToken(String token, String username) {
+    public Boolean validateToken(String token, UserDetails  userDetails) {
         try{
             final String extractedUsername = extractUsername(token);
             logger.info("ada data username: {}", extractedUsername);
-            return (extractedUsername.equals(username) && !isTokenExpired(token));
+            return (extractedUsername.equals(userDetails.getUsername()) && !isTokenExpired(token));
         }catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
             System.err.println("Error validating JWT: " + e.getMessage());
             return false;

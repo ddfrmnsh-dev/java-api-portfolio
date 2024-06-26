@@ -33,7 +33,7 @@ public class JwtRequestFilter  extends OncePerRequestFilter{
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         final String authorizationHeader = request.getHeader("Authorization");
-        logger.info("ada data header: {}", authorizationHeader);
+        logger.info("Authorization Header: {}", authorizationHeader);
 
 
         String username = null;
@@ -47,7 +47,7 @@ public class JwtRequestFilter  extends OncePerRequestFilter{
             jwtToken = authorizationHeader.substring(7);
             try {
                 username = jwtUtil.extractUsername(jwtToken);
-                logger.info("ada data user filter: {}", username);
+                logger.info("ada data user jwtfilter: {}", username);
             } catch (IllegalArgumentException e) {
                 System.err.println("Unable to get JWT Token");
             } catch (ExpiredJwtException e) {
@@ -61,7 +61,7 @@ public class JwtRequestFilter  extends OncePerRequestFilter{
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-            if (jwtUtil.validateToken(jwtToken, userDetails.getUsername())) {
+            if (jwtUtil.validateToken(jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 usernamePasswordAuthenticationToken

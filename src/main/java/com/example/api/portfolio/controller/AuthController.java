@@ -36,33 +36,20 @@ public class AuthController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
-//        // Lakukan otentikasi pengguna dengan AuthenticationManager
-//        Authentication authentication = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword())
-//        );
-//
-//        // Jika otentikasi berhasil, buat token JWT
-//        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
-//        final String jwt = jwtTokenUtil.generateToken(String.valueOf(userDetails));
-//
-//        // Kirim token JWT sebagai respons
-//        return ResponseEntity.ok(new JwtResponse(jwt));
         try {
-            // Lakukan otentikasi pengguna dengan AuthenticationManager
             logger.info("AuthenticationRequest: {}", authenticationRequest.getPassword());
+            logger.info("ada data getUsername auth: {}", authenticationRequest.getUsername());
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword())
             );
 
-            // Jika otentikasi berhasil, buat token JWT
             final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
-            final String jwt = jwtTokenUtil.generateToken(String.valueOf(userDetails));
 
-            // Kirim token JWT sebagai respons
-            return ResponseEntity.ok(new JwtResponse(jwt));
+            final String jwt = jwtTokenUtil.generateToken(userDetails);
+            MetaResponse meta = new MetaResponse("Successfully authenticated", HttpStatus.OK.value(), "success");
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(meta,jwt));
         } catch (AuthenticationException e) {
-            // Tangani kesalahan otentikasi
-            MetaResponse meta = new MetaResponse(e.getMessage(), HttpStatus.OK.value(), "failed");
+            MetaResponse meta = new MetaResponse(e.getMessage(), HttpStatus.UNAUTHORIZED.value(), "failed");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(meta,null));
         }
 
