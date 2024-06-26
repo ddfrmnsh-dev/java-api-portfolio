@@ -1,11 +1,16 @@
 package com.example.api.portfolio.security;
 
 import com.example.api.portfolio.controller.AuthController;
+import com.example.api.portfolio.dto.ApiResponse;
+import com.example.api.portfolio.dto.MetaResponse;
 import com.example.api.portfolio.service.MyUserDetailService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -55,6 +60,9 @@ public class JwtRequestFilter  extends OncePerRequestFilter{
             }
         } else {
             logger.warn("JWT Token does not begin with Bearer String");
+            MetaResponse meta = new MetaResponse("JWT Token does not provided", HttpStatus.UNAUTHORIZED.value(), "failed");
+            writeResponse(response, meta);
+            return;
         }
 
 
@@ -70,5 +78,11 @@ public class JwtRequestFilter  extends OncePerRequestFilter{
             }
         }
         chain.doFilter(request, response);
+    }
+
+    private void writeResponse(HttpServletResponse response, MetaResponse metaResponse) throws IOException {
+        response.setStatus(metaResponse.getCode());
+        response.setContentType("application/json");
+        response.getWriter().write(new ObjectMapper().writeValueAsString(metaResponse));
     }
 }
