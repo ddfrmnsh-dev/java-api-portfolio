@@ -4,6 +4,8 @@ import com.example.api.portfolio.dto.ApiResponse;
 import com.example.api.portfolio.dto.MetaResponse;
 import com.example.api.portfolio.dto.UserDto;
 import com.example.api.portfolio.model.User;
+import com.example.api.portfolio.model.UserPrincipal;
+import com.example.api.portfolio.repository.UserRepository;
 import com.example.api.portfolio.service.UserService;
 import com.example.api.portfolio.service.UserServiceImpl;
 import org.slf4j.Logger;
@@ -26,7 +28,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private UserRepository userRepository;
     @GetMapping("/users")
     public ApiResponse<List<?>> getAllUsers(){
         try {
@@ -96,15 +99,30 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public ApiResponse<?> getUserProfile() {
+    public ApiResponse<?> getUserProfile(Authentication authentication) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            User currentUser = (User) authentication.getPrincipal();
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserPrincipal currentUser = (UserPrincipal) authentication.getPrincipal();
 
-            logger.info("ada data name", currentUser);
-            MetaResponse meta = new MetaResponse("Success delete user : " + currentUser, HttpStatus.OK.value(), "success");
-            return new ApiResponse<>(meta, null);
+            logger.info("current user: {}", currentUser.getId());
+            MetaResponse meta = new MetaResponse("Success retrieve user : " + currentUser.getId(), HttpStatus.OK.value(), "success");
+            return new ApiResponse<>(meta, currentUser.getId());
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//            Object principal = authentication.getPrincipal();
+//
+//            if (principal instanceof org.springframework.security.core.userdetails.User) {
+//                String username = ((org.springframework.security.core.userdetails.User) principal).getUsername();
+//                // Anda mungkin perlu mengambil pengguna lengkap dari repository berdasarkan username
+//                User currentUser = userRepository.findByUsername(username);
+//
+//                logger.info("current user: {}", currentUser.getId());
+//                MetaResponse meta = new MetaResponse("Success retrieve user : " + currentUser, HttpStatus.OK.value(), "success");
+//                return new ApiResponse<>(meta, currentUser);
+//            } else {
+//                throw new RuntimeException("Unable to retrieve user details");
+//            }
         } catch(Exception e){
+            logger.warn("current user: {}", e.getMessage());
             MetaResponse meta = new MetaResponse(e.getMessage(), HttpStatus.OK.value(), "failed");
             return new ApiResponse<>(meta, null);
         }

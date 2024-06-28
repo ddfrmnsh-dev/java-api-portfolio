@@ -1,5 +1,6 @@
 package com.example.api.portfolio.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -27,6 +28,7 @@ public class User {
     @Column(name = "email")
     private String email;
 
+    @JsonIgnore
     @Column(name = "password")
     private String password;
 

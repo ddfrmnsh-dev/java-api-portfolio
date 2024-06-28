@@ -1,6 +1,7 @@
 package com.example.api.portfolio.service;
 
 import com.example.api.portfolio.model.User;
+import com.example.api.portfolio.model.UserPrincipal;
 import com.example.api.portfolio.repository.UserRepository;
 import com.example.api.portfolio.security.JwtTokenUtil;
 import org.slf4j.Logger;
@@ -30,7 +31,8 @@ public class MyUserDetailService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
-                new ArrayList<>());
+//        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
+//                new ArrayList<>());
+        return new UserPrincipal(user);
     }
 }

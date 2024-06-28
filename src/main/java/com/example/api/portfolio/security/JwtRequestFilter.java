@@ -56,13 +56,14 @@ public class JwtRequestFilter  extends OncePerRequestFilter{
             } catch (IllegalArgumentException e) {
                 System.err.println("Unable to get JWT Token");
             } catch (ExpiredJwtException e) {
+                logger.warn("JWT Token has expired: {}", e.getMessage());
                 System.err.println("JWT Token has expired");
             }
         } else {
             logger.warn("JWT Token does not begin with Bearer String");
-            MetaResponse meta = new MetaResponse("JWT Token does not provided", HttpStatus.UNAUTHORIZED.value(), "failed");
-            writeResponse(response, meta);
-            return;
+//            MetaResponse meta = new MetaResponse("JWT Token does not provided", HttpStatus.UNAUTHORIZED.value(), "failed");
+//            writeResponse(response, meta);
+//            return;
         }
 
 
